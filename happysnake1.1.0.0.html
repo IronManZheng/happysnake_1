@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇游戏</title>
+    <style>
+        *{
+            margin: 0px;
+            padding: 0px;
+        }
+        /* #map{
+            width: 500px;
+            height: 500px;
+            background-color: pink;
+        } */
+        table{
+            border-collapse: collapse;
+            position: absolute;            
+        }
+        td{
+            border: 1px solid grey;
+            width: 49px;
+            height: 49px;
+            
+        }
+    </style>
+</head>
+<body>
+    <div id="container">        
+    </div>
+    <div id="map"></div>
+    <script>
+        let map = document.getElementById('map');
+        // 定义一个放置新生身体的数组
+        let newBodies = [];
+        let newBody;
+        let flag = false;
+        let currentKey;
+        let OldKey;
+        let speed = 600;
+        // 用于接收setinterval的回参
+        let myVar;
+        
+        // 动态生成棋盘
+        window.onload = function () {
+            // alert("hello world");
+            let table = document.createElement('div');
+            let data = '<table style="position: absolute;">';
+            for(let i=0;i<10;i++){
+                data += '<tr>';
+                    for(let j=0;j<10;j++){
+                        data += '<td>';
+                        data += '</td>';
+                    }
+                data += '<tr>';
+            }
+            data += '</table>'; 
+            let container = document.getElementById("container");
+            container.innerHTML = data;
+            // container.style.position = 'absolute';
+
+            let map = document.getElementById("map");
+            // console.log(map);
+            map.style.width = 500 + 'px';
+            map.style.height = 500 + 'px';
+            map.style.backgroundColor = 'pink';
+        }
+
+        function createDiv(color,left,top) {
+            let div = document.createElement("div");
+            div.style.width = 50 + 'px';
+            div.style.height = 50 + 'px';
+            div.style.left = left; 
+            div.style.top = top;
+            div.style.position = 'absolute';
+            div.style.backgroundColor = color;
+            map.appendChild(div);
+            return div;
+        }
+        // 身体移动
+        function moveBody() {
+            for(let i = newBodies.length-1;i>=0;i--){
+                switch (newBodies[i].orientation) {
+                    case 'left':
+                        newBodies[i].style.left = parseInt(newBodies[i].style.left) - 50 + 'px';
+                        break;
+                    case 'right':
+                        newBodies[i].style.left = parseInt(newBodies[i].style.left) + 50 + 'px';
+                        break;
+                    case 'up':
+                        newBodies[i].style.top = parseInt(newBodies[i].style.top) - 50 + 'px';
+                        break;
+                    case 'down':
+                        newBodies[i].style.top = parseInt(newBodies[i].style.top) + 50 + 'px';
+                        break;    
+                    
+                    default:
+                        break;
+                }
+                
+                if(i === 0){
+                    newBodies[i].orientation = snakeHead.orientation;
+                }else{
+                    newBodies[i].orientation = newBodies[i-1].orientation;
+                }
+            
+            }
+        }
+        
+       
+        // 如果最后一节是头，则加100，否则加50
+        // 原因不明
+        function howToAdd(value,ori) {
+            switch (ori) {
+                    case 'left':
+                        console.log(lastBody);
+                        nleft =parseInt(lastBody.style.left) + value + 'px';
+                        ntop = lastBody.style.top; 
+                        break;
+                    case 'right':
+                        nleft =parseInt(lastBody.style.left) - value + 'px';
+                        ntop = lastBody.style.top;
+                        break;
+                    case 'up':
+                        nleft =lastBody.style.left;
+                        ntop = parseInt(lastBody.style.top) + value + 'px';
+                        break;
+                    case 'down':
+                        nleft =lastBody.style.left;
+                        ntop = parseInt(lastBody.style.top) - value + 'px';
+                        break;
+                    default:
+                        break;
+                }
+        }
+
+        // 判断头是否撞到身体
+        function headBeatBody() {
+            // console.log("running");
+            if(newBodies.length > 0 ){
+                // console.log("if is OK");
+                for(let i=0;i<newBodies.length;i++){
+                    // console.log(i + "," + newBodies[i].style.left);
+                    // console.log(i + "," + newBodies[i].style.top);
+                    if(snakeHead.style.left === newBodies[i].style.left && snakeHead.style.top === newBodies[i].style.top){
+                        alert("撞到身体，游戏结束");
+                        location.reload();
+                    }
+                }
+            }
+        }
+
+        // 头部移动
+        function move() {
+            switch (snakeHead.orientation) {
+                case 'left':
+                    
+                    if(parseInt(snakeHead.style.left) === 0){
+                        alert("撞到墙壁，游戏结束");
+                        location.reload();
+                    }
+                    headBeatBody();
+                    snakeHead.style.left = parseInt(snakeHead.style.left) - 50 + 'px';
+                    break;
+                case 'right':
+                    if(parseInt(snakeHead.style.left) === 450){
+                        alert("撞到墙壁，游戏结束");
+                        location.reload();
+                    }
+                    headBeatBody();
+                    snakeHead.style.left = parseInt(snakeHead.style.left) + 50 + 'px';                    
+                    break;
+                case 'up':
+                    if(parseInt(snakeHead.style.top) === 0){
+                        alert("撞到墙壁，游戏结束");
+                        location.reload();
+                    }
+                    headBeatBody();
+                    snakeHead.style.top = parseInt(snakeHead.style.top) - 50 + 'px';
+                    break;
+                case 'down':
+                    if(parseInt(snakeHead.style.top) === 450){
+                        alert("撞到墙壁，游戏结束");
+                        location.reload();
+                    }
+                    headBeatBody();
+                    snakeHead.style.top = parseInt(snakeHead.style.top) + 50 + 'px';
+                    break;    
+                default:
+                    break;
+            }
+            // 判断是否吃上了豆子
+            if(snakeHead.style.left ===food.style.left && snakeHead.style.top ===food.style.top){
+
+                nleft2 = parseInt(Math.random()*10)*50 + 'px';
+                ntop2 = parseInt(Math.random()*10)*50 + 'px'
+                changeFoodLocation();
+                                
+                 // 找到身体数组里的最后一段身体
+                 if(newBodies.length>0){
+                    // console.log(newBodies[newBodies.length-1]);
+                    lastBody = newBodies[newBodies.length-1];                    
+                }else{
+                    lastBody = snakeHead;                    
+                }                                              
+                //将最后一段身体的方向赋给新身体
+                let ori;
+                if(newBodies.length>0){                    
+                    ori = lastBody.orientation;
+                }else{                    
+                    ori = snakeHead.orientation;
+                }
+                
+                // console.log(newBody.orientation);
+                // 判断，如果lastbody是头，则加100，否则就加50
+                // 如果是头而加50的话，头和新身体会重叠
+                if(lastBody === snakeHead){
+                    howToAdd(100,ori);
+                }else{
+                    howToAdd(50,ori);
+                }
+                // 吃到豆子后生成一段新身体
+                let newBody = createDiv('yellow',nleft,ntop);
+                newBody.orientation = ori;
+                //将新生的身体放到身体数组中                
+                newBodies.push(newBody);
+                // console.log(newBodies.length);
+               
+                // console.log(lastBody);
+            }
+        }
+        // 控制蛇头移动方向
+        document.onkeydown = function(e) {
+            
+            switch (e.keyCode) {               
+                case 37:
+                    if(snakeHead.orientation !== 'right'){
+                        snakeHead.orientation = 'left';
+                        // console.log(snakeHead.orientation);
+                         
+                    }
+                                       
+                    break;
+                case 38:
+                    if(snakeHead.orientation !== 'down'){
+                        snakeHead.orientation = 'up';
+                        
+                    }
+                    
+                    break;
+                case 39:
+                    if(snakeHead.orientation !== 'left'){
+                        snakeHead.orientation = 'right';
+                        
+                    }
+                    
+                    break;
+                case 40:
+                    if(snakeHead.orientation !== 'up'){
+                        snakeHead.orientation = 'down';
+                       
+                    }
+                    
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // 判断生成食物的位置是否被蛇的身体占据
+        // 对newBodies成员位置的读取有延迟，未成功
+        function changeFoodLocation() {
+            // console.log("changeFoodLocation() is running");
+            if(newBodies.length > 0){
+                // console.log("for() is running");
+                console.log("nleft2:" + nleft2);
+                console.log("ntop2:" + ntop2);
+                for(let i=0;i<newBodies.length;i++){
+                    
+                    console.log(i + "," + newBodies[i].style.left);
+                    console.log(i + "," + newBodies[i].style.top);
+                    if(nleft2 === newBodies[i].style.left && ntop2 === newBodies[i].style.top){
+                        console.log("change");
+                        nleft2 = parseInt(Math.random()*10)*50 + 'px';
+                        ntop2 = parseInt(Math.random()*10)*50 + 'px';
+                        changeFoodLocation();
+                    }
+                }
+                
+            }
+            food.style.left = nleft2;
+            food.style.top = ntop2;
+        }
+
+        let nleft = parseInt(Math.random()*10)*50 + 'px';
+        let ntop = parseInt(Math.random()*10)*50 + 'px';
+
+
+        let nleft2 = parseInt(Math.random()*10)*50 + 'px';
+        let ntop2 = parseInt(Math.random()*10)*50 + 'px';
+        let food = createDiv('blue',nleft2,ntop2);
+        
+        
+
+        let snakeHead = createDiv('red',nleft,ntop);
+        snakeHead.orientation = 'left';
+        
+        setInterval(move,speed);
+        setInterval(moveBody,speed);
+    </script>
+</body>
+</html>
